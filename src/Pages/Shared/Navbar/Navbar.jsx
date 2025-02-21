@@ -1,7 +1,23 @@
-import { Link } from "react-router";
+import { useContext } from "react";
+import { Link, NavLink } from "react-router";
+import { AuthContext } from "../../../Provider/AuthProvider";
+import { FaArrowRightFromBracket } from "react-icons/fa6";
+import { toast } from "react-toastify";
 
 
 const Navbar = () => {
+    const {signOutUser,user} =useContext(AuthContext)
+
+    const handleSignOut = () => {
+        signOutUser()
+          .then(() => {
+            console.log('successful sign out')
+            toast.success('successful sign out')
+          })
+          .catch(error => {
+            console.log('failed to sign out .stay here. dont leave me alone',error)
+          })
+      }
     return (
         <div className="navbar bg-base-100 shadow-sm">
   <div className="navbar-start">
@@ -12,38 +28,41 @@ const Navbar = () => {
       <ul
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li><a>Item 1</a></li>
-        <li>
-          <a>Parent</a>
-          <ul className="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </li>
-        <li><a>Item 3</a></li>
+         <li><NavLink className="text-xl font-bold" to="/">Home</NavLink></li>
+         <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li>
       </ul>
     </div>
-    <a className="btn btn-ghost text-xl">daisyUI</a>
+    <a className="btn btn-ghost text-xl text-teal-900">TaskManagement</a>
   </div>
   <div className="navbar-center hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
-      <li><a>Item 1</a></li>
-      <li>
-        <details>
-          <summary>Parent</summary>
-          <ul className="p-2">
-            <li><a>Submenu 1</a></li>
-            <li><a>Submenu 2</a></li>
-          </ul>
-        </details>
-      </li>
-      <li><a>Item 3</a></li>
+    <li><NavLink className="text-xl font-bold" to="/">Home</NavLink></li>
+    <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li>
+      
     </ul>
   </div>
   <div className="navbar-end pr-6">
-   <Link to="/login">
+   {/* <Link to="/login">
    <button className="btn btn-info">Login</button>
-   </Link>
+   </Link> */}
+   {
+          user ? <>
+
+            <button onClick={handleSignOut} className="btn">Sign out</button>
+            <div   title={user?.displayName} className='w-10 rounded-full ml-2'>
+              <img className='rounded-full'
+                referrerPolicy='no-referrer'
+                alt='no Photo'
+                src={user?.photoURL}
+              />
+            </div>
+           
+          </> : <>
+            <Link to="/login">
+              <button className='btn btn-outline'><FaArrowRightFromBracket /> Login</button>
+            </Link>
+          </>
+        }
   </div>
 </div>
     );

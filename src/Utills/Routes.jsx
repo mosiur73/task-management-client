@@ -4,6 +4,8 @@ import {
 import MainLayout from "../MainLayout/MainLayout";
 import Login from "../Pages/Login/Login";
 import Home from "../Pages/Home/Home";
+import TaskManagement from "../Pages/TaskManagement/TaskManagement";
+import PrivateRoute from "../Pages/PrivateRoute/PrivateRoute";
 
 
 
@@ -16,6 +18,10 @@ import Home from "../Pages/Home/Home";
         {
             path:"/",
             element:<Home></Home>
+        },
+        {
+           path:"tasks",
+           element:<PrivateRoute><TaskManagement></TaskManagement></PrivateRoute>
         },
 
         {
