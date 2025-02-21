@@ -29,7 +29,9 @@ const Navbar = () => {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
          <li><NavLink className="text-xl font-bold" to="/">Home</NavLink></li>
-         <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li>
+         {/* <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li> */}
+         <li><NavLink className="text-xl font-bold" to="/dashboard/dashboardHome">Dashboard </NavLink></li>
+
       </ul>
     </div>
     <a className="btn btn-ghost text-xl text-teal-900">TaskManagement</a>
@@ -37,7 +39,8 @@ const Navbar = () => {
   <div className="navbar-center hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
     <li><NavLink className="text-xl font-bold" to="/">Home</NavLink></li>
-    <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li>
+    {/* <li><NavLink className="text-xl font-bold" to="/tasks">TaskManagement </NavLink></li> */}
+    <li><NavLink className="text-xl font-bold" to="/dashboard/dashboardHome">Dashboard </NavLink></li>
       
     </ul>
   </div>

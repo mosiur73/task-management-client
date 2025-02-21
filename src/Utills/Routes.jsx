@@ -6,6 +6,8 @@ import Login from "../Pages/Login/Login";
 import Home from "../Pages/Home/Home";
 import TaskManagement from "../Pages/TaskManagement/TaskManagement";
 import PrivateRoute from "../Pages/PrivateRoute/PrivateRoute";
+import Dashboard from "../DashBoard/Dashboard";
+import DashHome from "../DashBoard/DashHome";
 
 
 
@@ -27,7 +29,23 @@ import PrivateRoute from "../Pages/PrivateRoute/PrivateRoute";
         {
             path:"/login",
             element:<Login></Login>
-        }
+        },
+         
       ]
     },
+    {
+      path:"dashboard",
+      element:<PrivateRoute><Dashboard></Dashboard></PrivateRoute>,
+      children:[
+        {
+          path:"tasks",
+          element:<TaskManagement></TaskManagement>
+        },
+        {
+          path:"dashboardHome",
+          element:<DashHome></DashHome>
+        }
+      ]
+    }
+   
   ]);

@@ -2,7 +2,7 @@
 
 const Home = () => {
     return (
-        <div>
+        <div className="p-8">
             <div className="carousel rounded-box">
   <div className="carousel-item">
     <img

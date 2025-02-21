@@ -34,7 +34,7 @@ const handleGoogleSignIn = async () => {
       if (response.ok) {
         console.log("User data saved to the database",response);
         toast.success('Signin Successful')
-        window.location.href = "/tasks"; // Redirect to home page
+        window.location.href = "/dashboard/dashboardHome"; // Redirect to home page
         // navigate(from)
       } else {
         console.error("Failed to save user data");
@@ -54,7 +54,7 @@ const handleGoogleSignIn = async () => {
         </p>
         <button
           onClick={handleGoogleSignIn}
-          className="flex items-center justify-center w-full bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
+          className="flex items-center justify-center w-full bg-blue-400 text-white py-2 px-4 rounded-lg hover:bg-blue-800 transition duration-300"
         >
           <FcGoogle className="text-xl mr-2" />
           Sign in with Google
