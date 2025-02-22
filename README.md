@@ -4,8 +4,7 @@
 The **Task Management Application** is a modern web app designed to help users manage tasks efficiently. It includes features such as task categorization (To-Do, In Progress, Done), drag-and-drop reordering, real-time updates, and priority-based task visualization.
 
 ## 🔗 Live Links  
-- **Live Demo**: [Deploy Link Here](#)  
-- **Backend API**: [API Link Here](#)  
+- **Live Demo**:https://task-management-ec5f6.web.app/ 
 
 ## 🛠 Technologies Used  
 
