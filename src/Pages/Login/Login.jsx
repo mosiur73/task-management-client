@@ -23,7 +23,7 @@ const handleGoogleSignIn = async () => {
       };
 
       // Send user data to the backend
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch("https://task-management-server-dun-nine.vercel.app/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +32,7 @@ const handleGoogleSignIn = async () => {
       });
 
       if (response.ok) {
-        console.log("User data saved to the database",response);
+        // console.log("User data saved to the database",response);
         toast.success('Signin Successful')
         window.location.href = "/dashboard/dashboardHome"; // Redirect to home page
         // navigate(from)

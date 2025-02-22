@@ -30,7 +30,7 @@ const AuthProvider = ({children}) => {
 
       useEffect( ()=>{
         const unScribe=onAuthStateChanged(auth,currentUser =>{
-            console.log('user login',currentUser)
+            // console.log('user login',currentUser)
             setUser(currentUser)
             setLoading(false)
             

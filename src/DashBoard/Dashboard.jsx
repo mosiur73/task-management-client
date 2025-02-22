@@ -6,7 +6,7 @@ import { FcParallelTasks } from "react-icons/fc";
 import { LuListTodo } from "react-icons/lu";
 import { RiProgress5Line } from "react-icons/ri";
 import { IoIosCloudDone } from "react-icons/io";
-import { MdDashboard } from "react-icons/md";
+import { MdDashboard, MdManageAccounts } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 
 const Dashboard = () => {
@@ -45,7 +45,7 @@ const Dashboard = () => {
                     </li>
                     <li>
                         <Link to="/dashboard/manageTask" className="flex items-center gap-3">
-                            <FaTasks />Manage-Task
+                        <MdManageAccounts />Manage-Task
                         </Link>
                     </li>
                     <li>

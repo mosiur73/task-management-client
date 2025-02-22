@@ -11,15 +11,15 @@ const Navbar = () => {
     const handleSignOut = () => {
         signOutUser()
           .then(() => {
-            console.log('successful sign out')
+            // console.log('successful sign out')
             toast.success('successful sign out')
           })
           .catch(error => {
-            console.log('failed to sign out .stay here. dont leave me alone',error)
+            // console.log('failed to sign out .stay here. dont leave me alone',error)
           })
       }
     return (
-        <div className="navbar bg-base-100 shadow-sm">
+        <div className="navbar fixed top-0 z-10 left-0 right-0 bg-base-100 shadow-sm">
   <div className="navbar-start">
     <div className="dropdown">
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">

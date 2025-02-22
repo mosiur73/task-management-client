@@ -1,11 +1,42 @@
-
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const Todo = () => {
-    return (
-        <div>
-            <h3>comming soon .........</h3>
+  // Fetch tasks from the backend
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const res = await axios.get("https://task-management-server-dun-nine.vercel.app/tasks");
+      return res.data;
+    },
+  });
+
+  // Filter tasks for "To-Do" category
+  const todoTasks = tasks.filter((task) => task.category === "To-Do");
+
+  if (isLoading) return <p>Loading tasks...</p>;
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      <h2 className="text-3xl font-semibold text-gray-900 mb-6">To-Do Tasks</h2>
+
+      {todoTasks.length === 0 ? (
+        <p className="text-lg text-gray-500">No tasks in the "To-Do" category.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {todoTasks.map((task) => (
+            <div
+              key={task._id}
+              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
+              <h3 className="text-xl font-semibold text-gray-800">{task.title}</h3>
+              <p className="text-gray-600 mt-2">{task.description}</p>
+            </div>
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default Todo;

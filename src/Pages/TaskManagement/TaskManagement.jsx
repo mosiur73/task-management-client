@@ -5,8 +5,20 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { SortableItem } from "./SortableItem";
 
 const TaskManagement = () => {
@@ -14,16 +26,18 @@ const TaskManagement = () => {
   const [task, setTask] = useState({ title: "", description: "", category: "To-Do" });
   const [isOpen, setIsOpen] = useState(false);
 
+  // Fetch tasks from backend
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5000/tasks");
+      const { data } = await axios.get("https://task-management-server-dun-nine.vercel.app/tasks");
       return data;
     },
   });
 
+  // Mutation to add new task
   const mutation = useMutation({
-    mutationFn: (newTask) => axios.post("http://localhost:5000/tasks", newTask),
+    mutationFn: (newTask) => axios.post("https://task-management-server-dun-nine.vercel.app/tasks", newTask),
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
       setIsOpen(false);
@@ -32,15 +46,46 @@ const TaskManagement = () => {
     },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    mutation.mutate(task);
-  };
-
+  // Drag-and-Drop Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  // Handle drag end
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const draggedTask = tasks.find((task) => task._id === active.id);
+    const overTask = tasks.find((task) => task._id === over.id);
+
+    if (!draggedTask || !overTask) return;
+
+    // If moved to a new category, update the task category
+    if (draggedTask.category !== overTask.category) {
+      const updatedTask = { ...draggedTask, category: overTask.category };
+
+      // Optimistic UI update
+      queryClient.setQueryData(["tasks"], (oldTasks) =>
+        oldTasks.map((task) => (task._id === active.id ? updatedTask : task))
+      );
+
+      // Send update to backend
+      try {
+        await axios.put(`https://task-management-server-dun-nine.vercel.app/tasks/${active.id}`, updatedTask);
+        queryClient.invalidateQueries(["tasks"]);
+      } catch (error) {
+        console.error("Failed to update category", error);
+        toast.error("Failed to update task category");
+      }
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    mutation.mutate(task);
+  };
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -50,7 +95,9 @@ const TaskManagement = () => {
       <button onClick={() => setIsOpen(true)} className="p-3 px-4 bg-blue-500 text-white text-xl font-bold rounded">
         Add Task
       </button>
-      <DndContext sensors={sensors} collisionDetection={closestCenter}>
+      
+      {/* Drag-and-Drop Context */}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           {["To-Do", "In Progress", "Done"].map((category) => (
             <div key={category} className="bg-gray-100 p-4 rounded-lg shadow-lg">
@@ -72,6 +119,8 @@ const TaskManagement = () => {
           ))}
         </div>
       </DndContext>
+
+      {/* Modal for Adding Tasks */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setIsOpen(false)}>
           <div className="fixed inset-0 bg-black bg-opacity-50" />
@@ -102,7 +151,9 @@ const TaskManagement = () => {
                   <option value="In Progress">In Progress</option>
                   <option value="Done">Done</option>
                 </select>
-                <button type="submit" className="p-2 px-6 bg-blue-500 text-white rounded">Add</button>
+                <button type="submit" className="p-2 px-6 bg-blue-500 text-white rounded">
+                  Add
+                </button>
               </form>
             </Dialog.Panel>
           </div>

@@ -6,7 +6,7 @@ const DashHome = () => {
   const { data: tasks, isLoading } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5000/tasks");
+      const { data } = await axios.get("https://task-management-server-dun-nine.vercel.app/tasks");
       return data;
     },
   });
@@ -29,9 +29,10 @@ const DashHome = () => {
   // Task statistics
   const taskData = {
     total: tasks.length,
-    completed: tasks.filter((task) => task.status === "completed").length,
-    inProgress: tasks.filter((task) => task.status === "in progress").length,
-    todos: tasks.filter((task) => task.status === "to do").length,
+    // completed: tasks.filter((task) => task.status === "completed").length,
+    completed: tasks.filter((task) => task.category === "Done").length,
+    inProgress: tasks.filter((task) => task.category === "In Progress").length,
+    todos : tasks.filter((task) => task.category === "To-Do").length
   };
 
   return (
