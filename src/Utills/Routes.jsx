@@ -8,6 +8,10 @@ import TaskManagement from "../Pages/TaskManagement/TaskManagement";
 import PrivateRoute from "../Pages/PrivateRoute/PrivateRoute";
 import Dashboard from "../DashBoard/Dashboard";
 import DashHome from "../DashBoard/DashHome";
+import Todo from "../DashBoard/Todo/Todo";
+import Progress from "../DashBoard/Progress/Progress";
+import Done from "../DashBoard/Done/Done";
+import ManageTask from "../DashBoard/ManageTask/ManageTask";
 
 
 
@@ -44,6 +48,21 @@ import DashHome from "../DashBoard/DashHome";
         {
           path:"dashboardHome",
           element:<DashHome></DashHome>
+        },{
+          path:"todo",
+          element:<Todo></Todo>
+        },
+        {
+          path:"progress",
+          element:<Progress></Progress>
+        },
+        {
+          path:"done",
+          element:<Done></Done>
+        },
+        {
+          path:"manageTask",
+          element:<ManageTask></ManageTask>
         }
       ]
     }

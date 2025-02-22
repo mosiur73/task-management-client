@@ -40,21 +40,26 @@ const Dashboard = () => {
                     </li>
                     <li>
                         <Link to="/dashboard/tasks" className="flex items-center gap-3">
-                            <FaTasks /> Task
+                            <FaTasks />All-Task
                         </Link>
                     </li>
                     <li>
-                        <Link className="flex items-center gap-3">
+                        <Link to="/dashboard/manageTask" className="flex items-center gap-3">
+                            <FaTasks />Manage-Task
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/dashboard/todo" className="flex items-center gap-3">
                             <LuListTodo /> To Do
                         </Link>
                     </li>
                     <li>
-                        <Link className="flex items-center gap-3">
+                        <Link to="/dashboard/progress" className="flex items-center gap-3">
                             <RiProgress5Line /> In Progress
                         </Link>
                     </li>
                     <li>
-                        <Link className="flex items-center gap-3">
+                        <Link to="/dashboard/done" className="flex items-center gap-3">
                             <IoIosCloudDone /> Done
                         </Link>
                     </li>

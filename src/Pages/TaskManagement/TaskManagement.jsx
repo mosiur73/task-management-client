@@ -5,18 +5,16 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, KeyboardSensor } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { SortableItem } from "./SortableItem"; // এই কম্পোনেন্টটি তৈরি করুন
+import { SortableItem } from "./SortableItem";
 
 const TaskManagement = () => {
   const queryClient = useQueryClient();
   const [task, setTask] = useState({ title: "", description: "", category: "To-Do" });
-  const [editingTask, setEditingTask] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTask, setActiveTask] = useState(null); // সক্রিয় টাস্ক ট্র্যাক করতে
 
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
       const { data } = await axios.get("http://localhost:5000/tasks");
@@ -25,91 +23,24 @@ const TaskManagement = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (newTask) =>
-      newTask._id ? axios.put(`http://localhost:5000/tasks/${newTask._id}`, newTask) : axios.post("http://localhost:5000/tasks", newTask),
+    mutationFn: (newTask) => axios.post("http://localhost:5000/tasks", newTask),
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
       setIsOpen(false);
       setTask({ title: "", description: "", category: "To-Do" });
-      setEditingTask(null);
-      toast.success(editingTask ? "Task updated successfully!" : "Task added successfully!");
-    },
-  });
-
-  const deleteTaskMutation = useMutation({
-    mutationFn: (id) => axios.delete(`http://localhost:5000/tasks/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["tasks"]);
-      toast.error("Task deleted successfully!");
+      toast.success("Task added successfully!");
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutation.mutate({ ...task, _id: editingTask?._id });
+    mutation.mutate(task);
   };
 
-  const handleEdit = (task) => {
-    console.log("Editing Task:", task); // কনসোলে টাস্ক ডেটা দেখুন
-    setEditingTask(task);
-    setTask({ title: task.title, description: task.description, category: task.category });
-    setIsOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    console.log("Deleting Task ID:", id); // কনসোলে টাস্ক আইডি দেখুন
-    deleteTaskMutation.mutate(id);
-  };
-
-  // ড্রাগ অ্যান্ড ড্রপ ফাংশনালিটি
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
-
-  const handleDragStart = (event) => {
-    const { active } = event;
-    setActiveTask(tasks.find((task) => task._id === active.id));
-  };
-
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      const oldIndex = tasks.findIndex((task) => task._id === active.id);
-      const newIndex = tasks.findIndex((task) => task._id === over.id);
-
-      // টাস্কের নতুন কলাম নির্ধারণ করুন
-      const newCategory = tasks[newIndex].category;
-
-      // ফ্রন্টএন্ডে টাস্কগুলির অর্ডার আপডেট করুন
-      const updatedTasks = arrayMove(tasks, oldIndex, newIndex);
-      queryClient.setQueryData(["tasks"], updatedTasks);
-
-      // ব্যাকএন্ডে আপডেট করুন
-      try {
-        const response = await axios.put(`http://localhost:5000/tasks/${active.id}`, {
-          ...activeTask,
-          category: newCategory, // নতুন কলাম
-          order: newIndex, // নতুন অর্ডার
-        });
-
-        // আপডেটেড ডেটা কনসোলে দেখুন
-        console.log("Updated Task:", response.data);
-
-        // ফ্রন্টএন্ডে আপডেটেড ডেটা সেট করুন
-        queryClient.setQueryData(["tasks"], (oldTasks) =>
-          oldTasks.map((task) => (task._id === active.id ? response.data : task))
-        );
-      } catch (error) {
-        console.error("Error updating task:", error);
-      }
-    }
-
-    setActiveTask(null);
-  };
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -119,8 +50,7 @@ const TaskManagement = () => {
       <button onClick={() => setIsOpen(true)} className="p-3 px-4 bg-blue-500 text-white text-xl font-bold rounded">
         Add Task
       </button>
-
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           {["To-Do", "In Progress", "Done"].map((category) => (
             <div key={category} className="bg-gray-100 p-4 rounded-lg shadow-lg">
@@ -133,14 +63,7 @@ const TaskManagement = () => {
                       <div className="bg-white p-4 mb-3 rounded-lg shadow-md transition-transform transform hover:scale-105">
                         <h3 className="font-bold text-lg">{task.title}</h3>
                         <p className="text-gray-700">{task.description}</p>
-                        <div className="mt-3 flex justify-end gap-3">
-                          <button onClick={() => handleEdit(task)} className="p-2 px-4 bg-blue-500 text-white rounded-lg text-sm">
-                            Edit
-                          </button>
-                          <button onClick={() => handleDelete(task._id)} className="p-2 px-4 bg-red-500 text-white rounded-lg text-sm">
-                            Delete
-                          </button>
-                        </div>
+                        <p className="text-sm text-gray-500">Category: {task.category}</p>
                       </div>
                     </SortableItem>
                   ))}
@@ -148,15 +71,13 @@ const TaskManagement = () => {
             </div>
           ))}
         </div>
-        <DragOverlay>{activeTask ? <div className="bg-white p-4 rounded-lg shadow-md">{activeTask.title}</div> : null}</DragOverlay>
       </DndContext>
-
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setIsOpen(false)}>
           <div className="fixed inset-0 bg-black bg-opacity-50" />
           <div className="fixed inset-0 flex items-center justify-center">
             <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-96">
-              <Dialog.Title className="text-lg font-bold">{editingTask ? "Edit Task" : "Add Task"}</Dialog.Title>
+              <Dialog.Title className="text-lg font-bold">Add Task</Dialog.Title>
               <form onSubmit={handleSubmit} className="mt-4">
                 <input
                   type="text"
@@ -167,7 +88,6 @@ const TaskManagement = () => {
                   required
                 />
                 <textarea
-                  type="text"
                   placeholder="Description"
                   value={task.description}
                   onChange={(e) => setTask({ ...task, description: e.target.value })}
@@ -182,14 +102,7 @@ const TaskManagement = () => {
                   <option value="In Progress">In Progress</option>
                   <option value="Done">Done</option>
                 </select>
-                <div className="flex justify-end">
-                  <button type="button" onClick={() => setIsOpen(false)} className="p-2 bg-gray-400 text-white rounded mr-2">
-                    Cancel
-                  </button>
-                  <button type="submit" className="p-2 px-6 bg-blue-500 text-white rounded">
-                    {editingTask ? "Update" : "Add"}
-                  </button>
-                </div>
+                <button type="submit" className="p-2 px-6 bg-blue-500 text-white rounded">Add</button>
               </form>
             </Dialog.Panel>
           </div>
