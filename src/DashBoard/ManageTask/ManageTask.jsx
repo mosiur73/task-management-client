@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
 
 const ManageTask = () => {
   const queryClient = useQueryClient();
@@ -25,7 +24,7 @@ const ManageTask = () => {
       await axios.delete(`https://task-management-server-dun-nine.vercel.app/tasks/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["tasks"]); // Refresh tasks on delete
+      queryClient.invalidateQueries(["tasks"]);
       toast.success("Task deleted successfully!");
     },
   });
@@ -36,7 +35,7 @@ const ManageTask = () => {
       await axios.put(`https://task-management-server-dun-nine.vercel.app/tasks/${id}`, updatedTask);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["tasks"]); // Refresh tasks on update
+      queryClient.invalidateQueries(["tasks"]);
       setIsOpen(false);
       setEditingTask(null);
       toast.success("Task updated successfully!");
@@ -60,15 +59,13 @@ const ManageTask = () => {
   if (isLoading) return <p>Loading tasks...</p>;
 
   return (
-  <div>
-        <h2 className="text-3xl font-semibold text-gray-900 mb-6">Manage Tasks</h2>
-      <div className="grid grid-cols-3 gap-4 p-6">
-      {["To-Do", "In Progress", "Done"].map((category) => (
-        <div key={category} className="bg-gray-100 p-4 rounded-md shadow">
-          <h2 className="text-lg font-semibold text-center mb-4">{category}</h2>
-          {tasks
-            .filter((task) => task.category === category)
-            .map((task) => (
+    <div className="p-4">
+      <h2 className="text-3xl font-semibold text-gray-900 mb-6 text-center">Manage Tasks</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        {["To-Do", "In Progress", "Done"].map((category) => (
+          <div key={category} className="bg-gray-100 p-4 rounded-md shadow">
+            <h2 className="text-lg font-semibold text-center mb-4">{category}</h2>
+            {tasks.filter((task) => task.category === category).map((task) => (
               <div key={task._id} className="bg-white p-4 rounded-md shadow-md mb-3">
                 <h3 className="font-bold">{task.title}</h3>
                 <p className="text-gray-600">{task.description}</p>
@@ -77,21 +74,21 @@ const ManageTask = () => {
                   <button className="bg-blue-500 text-white px-4 py-1 rounded" onClick={() => handleEdit(task)}>
                     Edit
                   </button>
-                  <button className="bg-red-500 text-white px-4 py-1 rounded" onClick={() => deleteTaskMutation.mutate(task._id)}>
+                  <button className="bg-yellow-500 text-white px-4 py-1 rounded" onClick={() => deleteTaskMutation.mutate(task._id)}>
                     Delete
                   </button>
                 </div>
               </div>
             ))}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
 
       {/* Edit Task Modal */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setIsOpen(false)}>
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
-          <div className="fixed inset-0 flex items-center justify-center">
-            <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <Dialog.Title className="text-lg font-bold">Edit Task</Dialog.Title>
               <div className="mt-4">
                 <input
@@ -127,7 +124,6 @@ const ManageTask = () => {
         </Dialog>
       </Transition>
     </div>
-  </div>
   );
 };
 
